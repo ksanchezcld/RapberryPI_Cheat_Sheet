@@ -1,0 +1,131 @@
+Raspberry Pi 3 Cluster (Supercomputer)
+
+Here you will learn how to create a Raspberry Pi 3 Cluster (Supercomputer). This tutorial will work for all the 
+other Raspberry Pi’s.
+
+The Raspberry Pi 3 Cluster (Supercomputer) video tutorial below:
+
+Parts
+Raspberry Pi 3 (2 or more) http://goo.gl/isdLQQ
+Network Switch or Router http://goo.gl/Ds5csd
+USB Powered Hub
+Micro USB Cable (same as Pi’s you have) http://goo.gl/w8DT6V
+MicroSD Card 8GB or More (same as Pi’s you have) http://goo.gl/21Sro2
+RJ45 CAT 5e Cable (same as Pi’s you have) http://goo.gl/dEOOLc
+GeauxRobot Raspberry Pi B, 2 and 3 Stackable Case: http://goo.gl/F1LAc8
+Installing Raspbian
+Download the Raspbian Image: https://goo.gl/64dNnN
+Download and install Win32 Disk Imager: https://goo.gl/SgwAjN
+Burn the Raspbian Image to the MicroSD Card using Win32 Disk Imager
+Connect the MicroSD Card(with Raspbian burned on it) to the Raspberry Pi 3
+Connect a Network Cable from the Raspberry Pi 3 to your router(Same router your PC is connected to)
+Connect a Micro USB cable from the Raspberry Pi 3 to a power source.
+Download PuTTY: http://goo.gl/4jcu69
+Open up Command Prompt (Type cmd in the search)
+Type “ping raspberrypi ” and hit enter (Write down your Pi’s IP Address)
+Open up PuTTY and type the Pi’s IP Address and click open
+login: pi Password: raspbian  (Hit Enter)
+type “sudo raspi-config“ and hit enter
+Expand the File System
+Advanced Options
+Set the Hostname to Pi01
+Split the memory
+Enable SSH
+Finish the configuration
+Installing MPICH
+sudo apt-get update
+ sudo mkdir mpich2
+cd ~/mpich2
+sudo wget http://www.mpich.org/static/downloads/3.2/mpich-3.2.tar.gz
+sudo tar xfz mpich-3.2.tar.gz
+sudo mkdir /home/rpimpi/
+sudo mkdir /home/rpimpi/mpi-install
+mkdir /home/pi/mpi-build
+sudo apt-get install gfortran
+sudo /home/pi/mpich2/mpich-3.2/configure -prefix=/home/rpimpi/mpi-install
+sudo make
+sudo make install
+cd ..
+nano .bashrc
+               PATH=$PATH:/home/rpimpi/mpi-install/bin (Paste to bottom of file, then hold CTRL press “6” “x” let go of CTRL press “y” “enter”)
+
+sudo reboot
+mpiexec -n 1 hostname
+Installing MPI4PY
+wget https://bitbucket.org/mpi4py/mpi4py/downloads/mpi4py-2.0.0.tar.gz
+sudo tar -zxf mpi4py-2.0.0.tar.gz
+cd mpi4py-2.0.0
+sudo aptitude install python-dev
+python setup.py build
+sudo python setup.py install
+export PYTHONPATH=/home/pi/mpi4py-2.0.0
+mpiexec -n 5 python demo/helloworld.py
+ 
+
+Install nmap
+sudo apt-get update
+Sudo apt-get install nmap
+Get current IP
+ifconfig
+Scan subnet for Pi’s
+sudo nmap -sn 192.168.1.*
+ Change Pi’s Name (Do this step for Pi02,Pi03,Pi04)
+ssh pi@192.168.1.2 (Pi01,Pi02,Pi03,Pi04 IP Address)
+Password: raspberry
+sudo raspi-config
+Scroll down to Advanced hit Enter
+Scroll down to Hostname hit Enter
+Change the name (Pi01,Pi02,Pi03,Pi04) Hit Enter
+Press Tab until Finish is selected then hit Enter
+Edit Machinefile
+nano machinefile
+192.168.1.1
+192.168.1.2
+192.168.1.3
+192.168.1.4
+Hold CTRL Press 6 x Press y Hit Enter
+
+Text Machinefile
+mpiexec -n 1 hostname
+mpiexec -f machinefile -n 4 hostname
+Add keys to all pi’s
+Pi01
+ssh-keygen
+cd ~
+cd .ssh
+cp id_rsa.pub Pi01
+Pi02
+ssh pi@192.168.1.2
+ssh-keygen
+cd .ssh
+cp id_rsa.pub Pi02
+scp 192.168.1.1:/home/pi/.ssh/Pi01 .
+cat Pi01 >> authorized_keys
+exit
+Pi03
+ssh pi@192.168.1.3
+ssh-keygen
+cd .ssh
+cp id_rsa.pub Pi03
+scp 192.168.1.1:/home/pi/.ssh/Pi01 .
+cat Pi01 >> authorized_keys
+exit
+Pi04
+ssh pi@192.168.1.4
+ssh-keygen
+cd .ssh
+cp id_rsa.pub Pi04
+scp 192.168.1.1:/home/pi/.ssh/Pi01 .
+cat Pi01 >> authorized_keys
+exit
+Pi01 (Do this For All Pi’s)
+scp 192.168.1.2:/home/pi/.ssh/Pi02 .
+cat Pi02 >> authorized_keys
+scp 192.168.1.3:/home/pi/.ssh/Pi03 .
+cat Pi03 >> authorized_keys
+scp 192.168.1.4:/home/pi/.ssh/Pi04 .
+cat Pi04 >> authorized_keys
+Run new machinefile
+cd ~
+mpiexec -f machinefile -n 4 hostname
+Raspberry Pi 3 Cluster (Supercomputer)

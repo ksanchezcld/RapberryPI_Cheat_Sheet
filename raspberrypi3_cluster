@@ -129,3 +129,7 @@ Run new machinefile
 cd ~
 mpiexec -f machinefile -n 4 hostname
 Raspberry Pi 3 Cluster (Supercomputer)
+
+
+
+https://www.raspberrypi.org/magpi/pi-spark-supercomputer/
